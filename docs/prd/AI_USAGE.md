@@ -90,3 +90,37 @@
 **Modificación:** Se mantiene pendiente la evidencia de datos reales y la decisión final sobre orden adicional; la sugerencia se documentó como preferida pero no definitiva.
 
 **Consecuencia:** La implementación inicial puede priorizar cursor/seek, pero se revisará con métricas de latencia y requisitos de auditoría reales.
+
+
+# AI_USAGE — Lab 2
+
+## Entrada 1 — Lab 3: Implementación del endpoint de historial con TDD asistido
+
+**Fecha:** 2026-08-11
+
+**Objetivo:** Implementar y validar el endpoint `GET /api/v1/transacciones` siguiendo la arquitectura pedida por el PRD y con un ciclo de pruebas guiado por TDD.
+
+**Herramienta y modelo:** GitHub Copilot Chat, revisión manual por auditor humano, FastAPI + Pydantic v2 + pytest.
+
+**Contexto proporcionado:** El PRD definía un historial de transacciones de comercio autorizado con filtros por rango de fechas, estado, paginación y ausencia de exposición de datos sensibles. También se exigía una coherencia entre modelo, router, servicio y repositorio, con foco en 90 días y control de acceso.
+
+**Salida obtenida:** Implementación mínima del flujo completo: schema canónico, router HTTP, servicio de negocio y repositorio fake. Se generó además una suite de tests de endpoint con casos de validación y error.
+
+**Problema detectado:** Había varias versiones de modelos y reglas duplicadas entre capas; además, el primer ciclo de validación no había dejado un contrato consistente entre PRD, schema y tests.
+
+**Cambio realizado por mí:**
+- Unifiqué los modelos de historial en `app/schemas/models.py` y dejé `app/schemas/__init__.py` vacío.
+- Implementé el endpoint `GET /api/v1/transacciones` con validación de Authorization y manejo de errores HTTP.
+- Separé responsabilidades en router, service y repository.
+- Añadí validación de rango 90 días y de `page_size` en el schema.
+- Reescribí la suite de tests para cubrir casos de éxito y de error con contrato real del endpoint.
+- Validé la solución con pytest y dejé evidencia de que la feature quedó en verde.
+
+**Criterio o evidencia utilizada:** PRD del historial, diagrama de secuencia, decisiones de paginación y diseño del ERD; así como la ejecución real de la suite de tests con resultado exitoso.
+
+**Pregunta todavía abierta:**
+- PREGUNTA ABIERTA: ¿Se desea formalizar una capa adicional de autenticación real con JWT firmado y claims institucionales, o mantener el mock actual como contrato de laboratorio?
+
+## Cierre del registro de laboratorio
+
+Este archivo documenta la evolución del trabajo desde el PRD inicial hasta la implementación y validación del endpoint de historial. Cada entrada refleja una decisión de diseño, un ajuste de alcance o una evidencia de validación, manteniendo la trazabilidad del proceso bajo auditoría humana.
