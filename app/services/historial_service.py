@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from datetime import datetime
-
 from app.repositories.historial_repo import get_fake_transactions
 from app.schemas.models import HistorialQueryParams
 
@@ -16,9 +14,9 @@ def _mask_pan(value: str) -> str:
 def _extract_merchant_id(jwt: str) -> str:
     """Extrae el commerce_id del JWT mock, sin autenticar realmente con terceros."""
     token = jwt.replace("Bearer ", "", 1).strip()
-    if token == "test.jwt.merchant-0001":
+    if token == "test.jwt.merchant-0001":  # noqa: S105
         return "MCHT-0001"
-    if token == "expired.jwt.token":
+    if token == "expired.jwt.token":  # noqa: S105
         raise ValueError("Invalid or expired JWT")
     raise ValueError("Invalid or expired JWT")
 
