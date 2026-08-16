@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+from datetime import date
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
 
-from app.schemas.models import HistorialQueryParams
+from app.schemas.models import HistorialQueryParams, HistorialState
 from app.services.historial_service import get_historial
 
 router = APIRouter(tags=["Historial"])
@@ -24,9 +25,9 @@ def _require_authorization(authorization: str | None = Header(default=None, alia
 
 @router.get("/transacciones", status_code=status.HTTP_200_OK)
 async def historial_get(
-    desde: Annotated[str, Query(...)],
-    hasta: Annotated[str, Query(...)],
-    estado: Annotated[str | None, Query()] = None,
+    desde: Annotated[date, Query(...)],
+    hasta: Annotated[date, Query(...)],
+    estado: Annotated[HistorialState | None, Query()] = None,
     page_size: Annotated[int, Query(ge=1, le=100)] = 50,
     cursor: Annotated[str | None, Query()] = None,
     authorization: str = Depends(_require_authorization),
