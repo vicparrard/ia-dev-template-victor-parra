@@ -229,6 +229,12 @@ def _extract_keyword(user_msg: str) -> str:
     consulta truncada a 20 chars.
     """
     clean = re.sub(r"[¿?¡!.,;:()\"']", " ", user_msg.lower())
+
+    # Priorizar duraciones explícitas como '90 días', '30 dias', '7 días'
+    duracion_match = re.search(r"(\d{1,4})\s*d[ií]as", user_msg.lower())
+    if duracion_match:
+        return f"{duracion_match.group(1)} días"
+
     candidatos = [
         palabra
         for palabra in clean.split()

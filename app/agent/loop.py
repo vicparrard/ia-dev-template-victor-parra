@@ -6,8 +6,10 @@ from typing import Any
 from app.agent.logger import log_step
 from app.agent.tools import TOOLS_SCHEMA, buscar_regla_prd
 
+# Baranda #1: límite de iteraciones del loop
 MAX_STEPS = 5
 
+# Baranda #2: prompt del sistema que guía al LLM a actuar como agente ReAct especializado en el PRD de LegacyPay
 SYSTEM_PROMPT = (
     "Solo respondés sobre el PRD de LegacyPay. "
     "Si te preguntan otra cosa decís 'fuera de alcance'. "
