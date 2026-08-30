@@ -173,3 +173,57 @@
 ## Cierre del registro de laboratorio
 
 Este archivo documenta la evolución del trabajo desde el PRD inicial hasta la implementación y validación del endpoint de historial. Cada entrada refleja una decisión de diseño, un ajuste de alcance o una evidencia de validación, manteniendo la trazabilidad del proceso bajo auditoría humana.
+
+# AI_USAGE.md · Proyecto Final Victor Parra
+
+## Entrada 1 · 2026-08-25
+
+**Contexto:** generación del esqueleto del agente en `app/agent/`.
+**Herramienta IA:** Copilot Agent Mode / Claude Code / Cursor / etc.
+**Prompt clave:** el prompt canónico del Lab 4 (tools + loop + logger).
+**Decisión IA:** propuso los 3 archivos con TOOLS_SCHEMA, loop ReAct y logger.
+**Decisión humana:** acepté con ajuste · agregué comentarios de barandas.
+**Aprendizaje:** sin "patrón ReAct" en el prompt, Copilot arma un pipeline
+determinístico. La palabra clave importa.
+
+## Entrada 2 · 2026-08-27
+
+**Contexto:** creación del Golden Set de evaluación en `evals/eval_agent.py` (Proyecto Final Parte II), a partir del prompt corto sugerido en la guía sobre `app/agent/loop.py`.
+
+**Herramienta IA:** Copilot Chat (prompt corto referenciando `#file:app/agent/loop.py`, pidiendo 3 casos: `rango-90-dias`, `pan-solo-ultimos-4`, `fuera-de-alcance`).
+
+**Decisión IA:** el template base de la guía definía cada caso con un único `expected_substring` (string) y comparaba con `==` estricta contra la respuesta del agente.
+
+**Problema detectado:** un solo substring esperado por caso es demasiado rígido — el agente/retriever puede devolver variantes de fraseo razonables (p. ej. "últimos 90 días" vs "90 días", o distintas formas de indicar que no hay datos de tarjeta) y el test fallaría por fraseo aunque la regla de negocio esté bien aplicada.
+
+**Decisión humana:** reescribí cada caso para aceptar `expected_substrings` (lista de variantes aceptables) en lugar de un único string, y agregué truncado del resultado a 800 caracteres en el print para poder debuggear sin saturar la consola.
+
+**Aprendizaje:** al generar evals con IA conviene revisar si el criterio de "pass" es demasiado literal; el objetivo es validar la regla de negocio (outcome), no el fraseo exacto.
+
+## Entrada 3 · 2026-08-27
+
+**Contexto:** hacer explícitas en el código las 2 barandas pedidas por la consigna (scope + budget), que hasta ese momento vivían implícitas en el prompt de generación de `loop.py`.
+
+**Herramienta IA:** revisión manual sobre el código ya generado por Copilot en la sesión del martes (Parte I del proyecto).
+
+**Decisión humana:** agregué los comentarios `# Baranda #1: límite de iteraciones del loop` sobre `MAX_STEPS` y `# Baranda #2: prompt del sistema que guía al LLM...` sobre `SYSTEM_PROMPT`, para que ambas barandas queden visibles en un review de código y no solo enterradas en el texto del prompt original.
+
+**Aprendizaje:** una baranda que solo existe en el prompt de generación es fácil de perder de vista en el código; dejarla comentada explícitamente ayuda a que cualquiera que audite el agente la identifique sin tener que reconstruir el prompt original.
+
+## Entrada 4 · 2026-08-30
+
+**Contexto:** ampliar el `README.md` a formato "Release Candidate" (sección "cómo probarlo en 5 min", arquitectura del agente, barandas aplicadas, criterios de aceptación, limitaciones conocidas), como pide el cierre del Proyecto Final Parte II antes de la entrega del 31/08.
+
+**Herramienta IA:** Copilot Chat, revisión manual.
+
+**Problema detectado:** el checklist de "Criterios de aceptación" incluía un ítem de "CI verde en GitHub Actions" marcado como cumplido sin haber verificado el workflow real en ese momento.
+
+**Decisión humana:** dejé el checklist alineado con lo efectivamente verificable — el "cómo probarlo en 5 min" quedó testeado paso a paso (clonar, `uv sync`, levantar mock, correr agente, correr evals), y las "Limitaciones conocidas" documentan explícitamente que el retriever es lexical sin embeddings y que el mock LLM es determinístico y no cubre el 100% de las respuestas de un LLM real.
+
+## Entrada 5 · 2026-08-30
+
+**Contexto:** verificación final del pipeline de CI (`.github/workflows/ci.yml`) antes de la entrega — lint (ruff), type check (mypy), security scan (bandit) y tests con cobertura mínima 60% (pytest).
+
+**Herramienta IA:** ninguna generación nueva; verificación manual del workflow ya definido.
+
+**Decisión humana:** revisé que los 5 jobs del pipeline (checkout, setup Python vía `.python-version`, `uv sync --frozen --all-groups`, ruff, mypy, bandit, pytest con `--cov-fail-under=60`) corresponden a lo que el proyecto final necesita cubrir antes de la entrega.
